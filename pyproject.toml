@@ -9,7 +9,7 @@ description = "Pre-flight assumption checks for causal discovery: which methods 
 readme = "README.md"
 license = { text = "MIT" }
 requires-python = ">=3.9"
-authors = [{ name = "Taha", email = "you@example.com" }]
+authors = [{ name = "Taha Bouhoun", email = "bouhountaha@gmail.com" }]
 keywords = ["causal discovery", "causal inference", "assumptions", "diagnostics", "LiNGAM", "PC", "FCI"]
 classifiers = [
     "Development Status :: 3 - Alpha",
