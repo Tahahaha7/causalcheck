@@ -1,5 +1,5 @@
 [build-system]
-requires = ["setuptools>=68", "wheel"]
+requires = ["setuptools>=77", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
@@ -7,14 +7,14 @@ name = "causalcheck"
 version = "0.1.0"
 description = "Pre-flight assumption checks for causal discovery: which methods your data can support, and which outputs to trust."
 readme = "README.md"
-license = { text = "MIT" }
+license = "MIT"
+license-files = ["LICENSE"]
 requires-python = ">=3.9"
 authors = [{ name = "Taha Bouhoun", email = "bouhountaha@gmail.com" }]
 keywords = ["causal discovery", "causal inference", "assumptions", "diagnostics", "LiNGAM", "PC", "FCI"]
 classifiers = [
     "Development Status :: 3 - Alpha",
     "Intended Audience :: Science/Research",
-    "License :: OSI Approved :: MIT License",
     "Programming Language :: Python :: 3",
     "Topic :: Scientific/Engineering",
 ]
