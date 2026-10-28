@@ -1,0 +1,42 @@
+name: tests
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+        python-version: ["3.9", "3.10", "3.11", "3.12"]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: pip
+
+      - name: Install
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e ".[dev]"
+
+      - name: Test
+        run: pytest -q
+
+      - name: CLI smoke test
+        run: |
+          python -c "
+          import numpy as np, pandas as pd
+          rng = np.random.default_rng(0); n = 500
+          a = rng.uniform(-1, 1, n); b = 0.8*a + 0.5*rng.uniform(-1, 1, n)
+          pd.DataFrame(dict(a=a, b=b)).to_csv('demo.csv', index=False)"
+          causalcheck demo.csv
+          causalcheck demo.csv --json > report.json
+          python -c "import json; d = json.load(open('report.json')); assert d['worst_status'] in ('pass', 'info', 'warn'), d['worst_status']"
