@@ -41,7 +41,7 @@ def recommend(results: list[CheckResult]) -> Advice:
     linear = lin is not None and lin.status == "pass"
     nongauss = noise is not None and noise.status == "pass"
     gaussian = noise is not None and noise.status == "warn"
-    mixed = types is not None and types.status == "warn"
+    mixed = types is not None and bool(types.details.get("discrete"))
     small = size is not None and size.status == "warn"
     near_det = det is not None and det.status in ("warn", "fail")
     latents = conf is not None and conf.status == "warn"
