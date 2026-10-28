@@ -8,6 +8,7 @@ Each check inspects the data (not any graph) and returns a CheckResult with a st
 """
 from __future__ import annotations
 
+import contextlib
 import warnings
 from dataclasses import dataclass, field
 
@@ -19,7 +20,15 @@ from sklearn.model_selection import KFold, cross_val_score
 from sklearn.pipeline import make_pipeline
 from sklearn.preprocessing import SplineTransformer
 
-warnings.filterwarnings("ignore")
+
+
+@contextlib.contextmanager
+def _quiet():
+    """Silence numeric/convergence warnings from numpy and sklearn only while a check runs."""
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore", RuntimeWarning)
+        warnings.simplefilter("ignore", UserWarning)
+        yield
 
 
 @dataclass
@@ -241,12 +250,13 @@ def check_confounding(prep: Prepared, linear: bool, n_boot: int = 5, frac: float
 
 
 def run_checks(df: pd.DataFrame, confounding: bool = False, seed: int = 0) -> tuple[Prepared, list[CheckResult]]:
-    prep = prepare(df)
-    results = [check_data_types(prep, len(df)), check_sample_size(prep)]
-    if len(prep.names) >= 2:
-        lin = check_linearity(prep, seed=seed)
-        linear = lin.status == "pass"
-        results += [lin, check_noise(prep, linear), check_determinism(prep), check_scale(prep)]
-        if confounding:
-            results.append(check_confounding(prep, linear, seed=seed))
+    with _quiet():
+        prep = prepare(df)
+        results = [check_data_types(prep, len(df)), check_sample_size(prep)]
+        if len(prep.names) >= 2:
+            lin = check_linearity(prep, seed=seed)
+            linear = lin.status == "pass"
+            results += [lin, check_noise(prep, linear), check_determinism(prep), check_scale(prep)]
+            if confounding:
+                results.append(check_confounding(prep, linear, seed=seed))
     return prep, results
