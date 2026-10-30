@@ -131,7 +131,7 @@ def check_linearity(prep: Prepared, tol: float = 0.02, max_rows: int = 2000, see
 
 
 def check_noise(prep: Prepared, linear: bool, alpha: float = 0.01,
-                min_skew: float = 0.3, min_kurt: float = 0.5) -> CheckResult:
+                min_skew: float = 0.2, min_kurt: float = 0.3) -> CheckResult:
     """Non-Gaussian disturbances are what let LiNGAM/ANM orient edges.
 
     Without the graph we use each variable's residual given all other variables as a proxy:
@@ -205,16 +205,22 @@ def check_determinism(prep: Prepared, r2_thresh: float = 0.98, corr_thresh: floa
 
 
 def check_scale(prep: Prepared, ratio_thresh: float = 10.0) -> CheckResult:
-    """Large variance differences let continuous-optimization methods sort by variance (varsortability)."""
+    """Scale disparity between variables.
+
+    Note: this cannot detect varsortability. In raw data, effects usually have more variance than
+    their causes even when all variances are within a factor of 2, so standardizing before any
+    continuous-optimization method (NOTEARS, DAGMA) is standing advice, not something this check gates.
+    """
     var = prep.raw.var(0)
     ratio = float(var.max() / max(var.min(), 1e-12))
     d = dict(variance_ratio=round(ratio, 1), variances={n: float(v) for n, v in zip(prep.names, var)})
     if ratio > ratio_thresh:
         return CheckResult("scale", "warn",
-                           f"variances differ by a factor of {ratio:.0f} -> NOTEARS/DAGMA-style methods "
-                           "may just recover the variance ordering; standardize first and distrust "
-                           "directions that follow variance", d)
-    return CheckResult("scale", "pass", "variables are on comparable scales", d)
+                           f"variances differ by a factor of {ratio:.0f} -> standardize before anything "
+                           "scale-sensitive (kernels, penalties, continuous optimization)", d)
+    return CheckResult("scale", "pass",
+                       "variables are on comparable scales (standardize anyway before NOTEARS/DAGMA: "
+                       "comparable scales do not rule out varsortability)", d)
 
 
 def check_confounding(prep: Prepared, linear: bool, n_boot: int = 5, frac: float = 0.8,

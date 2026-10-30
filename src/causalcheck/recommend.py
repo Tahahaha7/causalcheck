@@ -52,8 +52,8 @@ def recommend(results: list[CheckResult]) -> Advice:
         adv.fix_first.append("Drop or merge the near-duplicate columns listed under near-determinism; "
                              "every method treats them as a confusing extra edge.")
     if scale is not None and scale.status == "warn":
-        adv.fix_first.append("Standardize all variables before running anything, or any continuous-"
-                             "optimization method will mostly recover the variance ordering.")
+        adv.fix_first.append("Standardize all variables before running anything; the scale differences "
+                             "will dominate kernels, penalties and continuous-optimization methods.")
     if types is not None and types.details.get("dropped"):
         adv.fix_first.append(f"Encode or drop the non-numeric columns {types.details['dropped']} explicitly, "
                              "rather than letting them be silently ignored.")
@@ -115,16 +115,14 @@ def recommend(results: list[CheckResult]) -> Advice:
         add("ANM / CAM / RESIT (nonlinear additive noise)", USABLE,
             "works, but with linear relations the direction signal comes only from non-Gaussian noise")
 
-    # continuous optimization
-    if scale is not None and scale.status == "warn":
-        add("NOTEARS / DAGMA (continuous optimization)", AVOID,
-            "variance ordering will drive the result (varsortability); standardize first and still distrust directions")
-    elif gaussian:
+    # continuous optimization: varsortability cannot be detected from the data, so always standardize
+    if gaussian:
         add("NOTEARS / DAGMA (continuous optimization)", AVOID,
             "with Gaussian noise its directions are not identifiable; it will still output a DAG")
     else:
         add("NOTEARS / DAGMA (continuous optimization)", USABLE,
-            "fine for a skeleton; validate directions against a method with identifiability guarantees")
+            "standardize first (varsortability is common even on comparable scales); fine for a skeleton, "
+            "validate directions against a method with identifiability guarantees")
 
     # ---- trust notes
     if gaussian:
@@ -147,6 +145,8 @@ def recommend(results: list[CheckResult]) -> Advice:
     elif latents_untested:
         adv.trust.append("Hidden confounding was not tested; no method here can rule it out from "
                          "observational data alone.")
+    adv.trust.append("If you use NOTEARS/DAGMA, standardize first and treat their directions as hypotheses: "
+                     "in raw data effects tend to have more variance than causes, and these methods exploit that.")
     if mixed:
         adv.trust.append("Additive-noise direction tests are meaningless on the discrete columns; "
                          "their edges will stay undirected unless a collider orients them.")

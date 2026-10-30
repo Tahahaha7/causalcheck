@@ -84,7 +84,8 @@ METHODS
 - Some assumptions cannot be tested from observational data: faithfulness (no canceling effects) and the absence of selection bias. The report says so rather than pretending.
 - The noise check uses each variable's residual given all others as a stand-in for its true disturbance, because the graph is unknown.
 - The hidden-confounder check is a signal, not a proof. Passing it does not rule out confounding.
-- Thresholds (linearity gain 0.02, R² 0.98 for near-determinism, variance ratio 10) are sensible defaults, not laws. All are arguments to the check functions.
+- The scale check reports variance disparity; it cannot detect varsortability. In raw data, effects usually have more variance than their causes even when all variances are within a factor of 2, so standardizing before NOTEARS/DAGMA is standing advice regardless of what this check says.
+- Thresholds (linearity gain 0.02, R² 0.98 for near-determinism, variance ratio 10, residual kurtosis 0.3) were tuned against `benchmarks/validate_thresholds.py` so that warnings fire where the protected method actually starts failing. They are defaults, not laws; all are arguments to the check functions.
 
 ## Development
 
