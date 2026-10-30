@@ -19,7 +19,7 @@ class Report:
     discrete: list[str]
     checks: list[CheckResult]
     advice: Advice
-    version: str = "0.1.0"
+    version: str = "0.1.1"
 
     @property
     def worst_status(self) -> str:

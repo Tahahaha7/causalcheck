@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "causalcheck"
-version = "0.1.0"
+version = "0.1.1"
 description = "Pre-flight assumption checks for causal discovery: which methods your data can support, and which outputs to trust."
 readme = "README.md"
 license = "MIT"
