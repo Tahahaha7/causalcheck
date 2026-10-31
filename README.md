@@ -87,15 +87,6 @@ METHODS
 - The scale check reports variance disparity; it cannot detect varsortability. In raw data, effects usually have more variance than their causes even when all variances are within a factor of 2, so standardizing before NOTEARS/DAGMA is standing advice regardless of what this check says.
 - Thresholds (linearity gain 0.02, R² 0.98 for near-determinism, variance ratio 10, residual kurtosis 0.3) were tuned against `benchmarks/validate_thresholds.py` so that warnings fire where the protected method actually starts failing. They are defaults, not laws; all are arguments to the check functions.
 
-## Development
-
-```bash
-git clone https://github.com/Tahahaha7/causalcheck && cd causalcheck
-python3 -m venv .venv && source .venv/bin/activate
-pip install -e ".[dev]"
-pytest
-```
-
 ## License
 
 MIT
